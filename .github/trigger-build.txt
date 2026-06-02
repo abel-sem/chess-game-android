@@ -1,5 +1,5 @@
-Triggering Android build workflow.
+Triggering Android build workflow now (manual execution).
 
-This file was created to trigger the GitHub Actions workflow that builds the APK.
+This commit updates the trigger file to start the Android APK build workflow.
 
-Timestamp: 2026-06-02T00:00:00Z
+Timestamp: 2026-06-02T18:15:00Z
