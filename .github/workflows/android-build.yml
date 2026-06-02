@@ -16,6 +16,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Debug: show repo files and gradle wrapper info
+        run: |
+          echo "---- ls -la ----"
+          ls -la
+          echo "---- ls app ----"
+          ls -la app || true
+          echo "---- gradle wrapper files ----"
+          ls -la gradle/wrapper || true
+          echo "---- file gradlew ----"
+          if [ -f ./gradlew ]; then
+            file ./gradlew || true
+            echo "---- head gradlew ----"
+            head -n 20 ./gradlew || true
+            chmod +x ./gradlew || true
+            echo "converted permissions and will attempt dos2unix if available"
+            if command -v dos2unix >/dev/null 2>&1; then
+              dos2unix ./gradlew || true
+            fi
+          else
+            echo "gradlew not found"
+          fi
+          echo "---- java & gradle versions ----"
+          java -version || true
+          if command -v gradle >/dev/null 2>&1; then
+            gradle --version || true
+          fi
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -29,22 +56,25 @@ jobs:
       - name: Install Android SDK command-line tools and packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y unzip wget
+          sudo apt-get install -y unzip wget dos2unix
           mkdir -p $ANDROID_HOME/cmdline-tools
           cd $HOME
           wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
           mkdir -p $ANDROID_HOME/cmdline-tools/latest
           unzip -q cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools/latest
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          echo "PATH before: $PATH"
+          echo "PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH" >> $GITHUB_ENV
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
-      - name: Ensure Gradle is available
+      - name: Ensure Gradle is available and build with wrapper
         run: |
-          # Use system Gradle if Gradle wrapper jar is missing
+          set -x
+          # Prefer Gradle wrapper if present
           if [ -f ./gradlew ] && [ -f ./gradle/wrapper/gradle-wrapper.jar ]; then
-            chmod +x ./gradlew
-            echo "Using Gradle wrapper"
-            ./gradlew assembleDebug --no-daemon
+            echo "Using gradlew via bash to avoid shebang issues"
+            chmod +x ./gradlew || true
+            dos2unix ./gradlew || true
+            bash ./gradlew assembleDebug --no-daemon
           else
             echo "Gradle wrapper not fully available; installing gradle via apt"
             sudo apt-get update
