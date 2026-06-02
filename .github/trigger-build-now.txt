@@ -1,0 +1,5 @@
+Manual trigger for android-build workflow.
+
+Committed by GitHub Copilot Chat Assistant to start the Android APK build.
+
+Timestamp: 2026-06-02T18:30:00Z
