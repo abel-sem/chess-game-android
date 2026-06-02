@@ -1,0 +1,5 @@
+Triggering Android build workflow.
+
+This file was created to trigger the GitHub Actions workflow that builds the APK.
+
+Timestamp: 2026-06-02T00:00:00Z
