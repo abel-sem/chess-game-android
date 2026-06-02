@@ -1,0 +1,3 @@
+User requested manual run of android-build workflow.
+
+Triggering build now: 2026-06-02T18:41:00Z
